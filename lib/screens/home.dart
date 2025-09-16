@@ -47,7 +47,7 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.white,
         onButtonPressed: changePage,
         iconSize: 30,
-        activeColor: Color(0xFF01579B),
+        activeColor: Color(0xFF123B7A),
         selectedIndex: _selectedIndex,
         barItems: [
           BarItem(
