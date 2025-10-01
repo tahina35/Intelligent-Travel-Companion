@@ -1,0 +1,4 @@
+enum Activity {
+  indoor,
+  outdoor
+}

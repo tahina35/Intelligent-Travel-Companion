@@ -39,6 +39,10 @@ dependencies:
     git:
       url: https://github.com/watery-desert/sliding_clipped_nav_bar
   google_fonts: ^6.3.1
+  choice: ^2.3.2
+  another_xlider: ^3.0.2
+  shared_preferences: ^2.5.3
+  sqflite: ^2.4.2
 
 dev_dependencies:
   flutter_test:
@@ -64,7 +68,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/
+    - assets/db.sql
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

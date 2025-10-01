@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:itc/models/activity_type.dart';
+import 'package:itc/services/activity_service.dart';
+
+import '../../models/preferences.dart';
 
 class ActivityPreference extends StatefulWidget {
-  const ActivityPreference({super.key});
+
+  final Preferences preferences;
+  const ActivityPreference({super.key, required this.preferences});
 
   @override
   State<ActivityPreference> createState() => _ActivityPreferenceState();
@@ -11,27 +17,27 @@ class ActivityPreference extends StatefulWidget {
 class _ActivityPreferenceState extends State<ActivityPreference> {
 
   int selectedOption = -1;
+  final activityService = ActivityService();
+  List<ActivityType> options = [];
 
-  List<Map<String, String>> options = [
-    {
-      'index': '0',
-      'image': 'indoor_.png',
-      'label': 'Indoor',
-      'description': 'Enjoy museums, cozy cafés, and unique shops.'
-    },
-    {
-      'index': '1',
-      'image': 'outdoor_.jpg',
-      'label': 'Outdoor',
-      'description': 'Discover parks, iconic streets, and outdoor sights.'
-    },
-    {
-      'index': '2',
-      'image': 'both_.png',
-      'label': 'Both',
-      'description': 'Get a mix of the best indoor and outdoor experiences.'
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    getActivities();
+  }
+
+  Future<void> getActivities() async {
+
+    final data = await activityService.getActivities().then((activities) {
+      return activities.map((activity) => ActivityType.fromMap(activity)).toList();
+    });
+
+    print(data);
+
+    setState(() {
+      options = data;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +46,8 @@ class _ActivityPreferenceState extends State<ActivityPreference> {
       setState(() {
         selectedOption = index;
       });
+
+      widget.preferences.activityType = options[index];
     }
 
     return Column(
@@ -64,15 +72,17 @@ class _ActivityPreferenceState extends State<ActivityPreference> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: options.map((option) {
+
               bool isSelected = false;
               if(selectedOption >= 0) {
-                isSelected = selectedOption == int.parse(option['index']!);
+                isSelected = selectedOption == option.id;
               }
 
               return Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 3.0),
                   child: Card(
+                    color: Colors.white,
                     clipBehavior: Clip.antiAlias,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
@@ -84,50 +94,52 @@ class _ActivityPreferenceState extends State<ActivityPreference> {
                         style: BorderStyle.solid
                       ),
                     ),
-                    elevation: 0,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(25),
-                      onTap: () {
-                        selectOption(int.parse(option['index']!));
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: Ink.image(
-                                image: AssetImage('assets/${option['image']}'),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 5,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      option['label']!,
-                                      style: GoogleFonts.lato(
-                                        textStyle: Theme.of(context).textTheme.bodyLarge,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      option['description']!,
-                                      style: GoogleFonts.lato(
-                                        textStyle: Theme.of(context).textTheme.bodySmall,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ]
+                    elevation: 2,
+                    child: Ink(
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(25),
+                        onTap: () {
+                          selectOption(option.id);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Ink.image(
+                                  image: AssetImage('assets/${option.image}'),
                                 ),
                               ),
-                            ),
-                          ]
+                              Expanded(
+                                flex: 5,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        option.label,
+                                        style: GoogleFonts.lato(
+                                          textStyle: Theme.of(context).textTheme.bodyLarge,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        option.description,
+                                        style: GoogleFonts.lato(
+                                          textStyle: Theme.of(context).textTheme.bodySmall,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ]
+                                  ),
+                                ),
+                              ),
+                            ]
+                          ),
                         ),
                       ),
                     )

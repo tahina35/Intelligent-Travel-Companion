@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:itc/models/activity_type.dart';
+import 'package:itc/models/preferences.dart';
 import 'package:itc/screens/onboarding/activity_preference.dart';
 import 'package:itc/screens/onboarding/food_preference.dart';
 import 'package:itc/screens/onboarding/meal_time_preference.dart';
+import 'package:itc/models/meal_time_preference.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -15,10 +18,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   late PageController _pageController;
   int currentPage = 0;
 
-  List<Widget> screens = [
-    ActivityPreference(),
-    FoodPreference(),
-    MealTimePreference(),
+  Preferences preferences = Preferences(
+      active: true,
+      activityType: ActivityType.origin(),
+      mealTime: MealTimePreferences.origin(),
+      foodPreferences: []
+  );
+
+  late List<Widget> screens = [
+    ActivityPreference(preferences: preferences),
+    FoodPreference(preferences: preferences),
+    MealTimePreference(preferences: preferences),
   ];
 
   @override
@@ -35,10 +45,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     setState(() {
       if (currentPage < screens.length - 1) {
         currentPage++;
+      } else {
+        Navigator.pushNamed(context, '/');
       }
     });
     _pageController.animateToPage(currentPage,
         duration: const Duration(milliseconds: 400), curve: Curves.easeOutQuad);
+
+    //print(preferences.mealTime.breakfast.start);
   }
 
   void previousPage() {
@@ -121,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
                 child: Text(
-                  "Continue",
+                  (currentPage == screens.length - 1) ? "Done" : "Continue",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
