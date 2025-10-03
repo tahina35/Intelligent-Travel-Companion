@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:itc/models/activity_type.dart';
 import 'package:itc/services/activity_service.dart';
-
 import '../../models/preferences.dart';
 
 class ActivityPreference extends StatefulWidget {
@@ -16,13 +15,14 @@ class ActivityPreference extends StatefulWidget {
 
 class _ActivityPreferenceState extends State<ActivityPreference> {
 
-  int selectedOption = -1;
+  int selectedOption = 0;
   final activityService = ActivityService();
   List<ActivityType> options = [];
 
   @override
   void initState() {
     super.initState();
+    selectedOption = widget.preferences.activityType.id;
     getActivities();
   }
 
@@ -31,8 +31,6 @@ class _ActivityPreferenceState extends State<ActivityPreference> {
     final data = await activityService.getActivities().then((activities) {
       return activities.map((activity) => ActivityType.fromMap(activity)).toList();
     });
-
-    print(data);
 
     setState(() {
       options = data;
@@ -47,7 +45,7 @@ class _ActivityPreferenceState extends State<ActivityPreference> {
         selectedOption = index;
       });
 
-      widget.preferences.activityType = options[index];
+      widget.preferences.activityType = options[index - 1];
     }
 
     return Column(
@@ -74,7 +72,7 @@ class _ActivityPreferenceState extends State<ActivityPreference> {
             children: options.map((option) {
 
               bool isSelected = false;
-              if(selectedOption >= 0) {
+              if(selectedOption > 0) {
                 isSelected = selectedOption == option.id;
               }
 
@@ -108,7 +106,7 @@ class _ActivityPreferenceState extends State<ActivityPreference> {
                               Expanded(
                                 flex: 3,
                                 child: Ink.image(
-                                  image: AssetImage('assets/${option.image}'),
+                                  image: AssetImage('assets/images/${option.image}'),
                                 ),
                               ),
                               Expanded(

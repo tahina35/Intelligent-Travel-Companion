@@ -19,6 +19,11 @@ class PreferenceService {
     
   }
 
+  static Future<bool> isPreferenceSet() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isSet') ?? false;
+  }
+
   // static Future<Preferences> readData() async {
   //   final SharedPreferences prefs = await SharedPreferences.getInstance();
   //

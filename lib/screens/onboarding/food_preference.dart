@@ -34,6 +34,11 @@ class _FoodPreferenceState extends State<FoodPreference> {
 
   List<String> selectedValue = [];
 
+  initState() {
+    super.initState();
+    selectedValue = widget.preferences.foodPreferences;
+  }
+
   void setSelectedValue(List<String> value) {
     setState(() => selectedValue = value);
     widget.preferences.foodPreferences = selectedValue;

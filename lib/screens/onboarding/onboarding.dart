@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:itc/models/activity_type.dart';
 import 'package:itc/models/preferences.dart';
@@ -7,14 +8,18 @@ import 'package:itc/screens/onboarding/food_preference.dart';
 import 'package:itc/screens/onboarding/meal_time_preference.dart';
 import 'package:itc/models/meal_time_preference.dart';
 
+import '../../router/route_constants.dart';
+import '../../services/preference_service.dart';
+import 'location_permission.dart';
+
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  State<OnboardingScreen> createState() => OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class OnboardingScreenState extends State<OnboardingScreen> {
   late PageController _pageController;
   int currentPage = 0;
 
@@ -25,10 +30,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       foodPreferences: []
   );
 
+
   late List<Widget> screens = [
     ActivityPreference(preferences: preferences),
     FoodPreference(preferences: preferences),
     MealTimePreference(preferences: preferences),
+    LocationPermission(nextPage: nextPage),
   ];
 
   @override
@@ -37,22 +44,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _pageController = PageController(initialPage: currentPage);
   }
 
-  void selectedActivityType() {
-
-  }
 
   void nextPage() {
     setState(() {
       if (currentPage < screens.length - 1) {
         currentPage++;
       } else {
-        Navigator.pushNamed(context, '/');
+        PreferenceService.saveData(preferences);
+        context.pushNamed(RouteConstants.loading);
       }
     });
     _pageController.animateToPage(currentPage,
         duration: const Duration(milliseconds: 400), curve: Curves.easeOutQuad);
-
-    //print(preferences.mealTime.breakfast.start);
   }
 
   void previousPage() {
@@ -123,30 +126,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                 ),
               ),
-              SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: nextPage,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Text(
-                  (currentPage == screens.length - 1) ? "Done" : "Continue",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-
-                  ),
-                ),
-              ),
             ],
           ),
         ),
       ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.transparent,
+        child: Visibility(
+          visible: currentPage != screens.length - 1,
+          maintainSize: true,
+          maintainAnimation: true,
+          maintainState: true,
+          child: ElevatedButton(
+            onPressed: nextPage,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 50),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            child: Text(
+              (currentPage == screens.length - 1) ? "Done" : "Continue",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+
+              ),
+            ),
+          ),
+        ),
+      )
     );
   }
 }

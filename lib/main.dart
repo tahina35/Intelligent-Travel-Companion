@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:itc/screens/home.dart';
-import 'package:itc/screens/map.dart';
-import 'package:itc/screens/preferences.dart';
-import 'package:itc/screens/onboarding/onboarding.dart';
+import 'package:itc/router/app_router.dart';
 
 void main() {
-  runApp(MaterialApp(
+  runApp(MaterialApp.router(
     theme: ThemeData(
         scaffoldBackgroundColor: Color(0xFFFFFFFF),
         colorScheme: ColorScheme.light(
@@ -20,14 +17,7 @@ void main() {
           //onSurface: onSurface
         )
     ),
-    initialRoute: '/onboarding',
-    routes: {
-      '/': (context) => Home(),
-      '/onboarding': (context) => OnboardingScreen(),
-      '/map': (context) => Map(),
-      '/preferences': (context) => Preferences(),
-    },
-
+    routerConfig: AppRouter().router,
   ));
 }
 
