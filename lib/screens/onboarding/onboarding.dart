@@ -1,117 +1,163 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:itc/models/activity_type.dart';
+import 'package:itc/models/preferences.dart';
 import 'package:itc/screens/onboarding/activity_preference.dart';
 import 'package:itc/screens/onboarding/food_preference.dart';
 import 'package:itc/screens/onboarding/meal_time_preference.dart';
+import 'package:itc/models/meal_time_preference.dart';
+
+import '../../router/route_constants.dart';
+import '../../services/preference_service.dart';
+import 'location_permission.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  State<OnboardingScreen> createState() => OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class OnboardingScreenState extends State<OnboardingScreen> {
+  late PageController _pageController;
   int currentPage = 0;
+
+  Preferences preferences = Preferences(
+      active: true,
+      activityType: ActivityType.origin(),
+      mealTime: MealTimePreferences.origin(),
+      foodPreferences: []
+  );
+
+
+  late List<Widget> screens = [
+    ActivityPreference(preferences: preferences),
+    FoodPreference(preferences: preferences),
+    MealTimePreference(preferences: preferences),
+    LocationPermission(nextPage: nextPage),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: currentPage);
+  }
+
+
+  void nextPage() {
+    setState(() {
+      if (currentPage < screens.length - 1) {
+        currentPage++;
+      } else {
+        PreferenceService.saveData(preferences);
+        context.pushNamed(RouteConstants.loading);
+      }
+    });
+    _pageController.animateToPage(currentPage,
+        duration: const Duration(milliseconds: 400), curve: Curves.easeOutQuad);
+  }
+
+  void previousPage() {
+    setState(() {
+      if (currentPage > 0) {
+        currentPage--;
+      }
+    });
+    _pageController.animateToPage(currentPage,
+        duration: const Duration(milliseconds: 400), curve: Curves.easeOutQuad);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          children: [
-            const Spacer(flex: 2),
-            Expanded(
-              flex: 14,
-              child: PageView.builder(
-                itemCount: screens.length,
-                onPageChanged: (value) {
-                  setState(() {
-                    currentPage = value;
-                  });
-                },
-                itemBuilder: (context, index) => screens[index]
-              ),
-            ),
-            const Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                screens.length,
-                    (index) => Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: DotIndicator(isActive: index == currentPage),
-                    ),
-              ),
-            ),
-            const Spacer(flex: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF22A45D),
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Visibility(
+                visible: currentPage != 0,
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                child: TextButton.icon(
+                  onPressed: previousPage,
+                  icon: Icon(
+                      Icons.chevron_left,
+                      size: 25,
+                      color: Colors.black
+                  ),
+                  label: Text(
+                      'Back',
+                      style: GoogleFonts.lato(
+                        textStyle: Theme.of(context).textTheme.bodyLarge,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black
+                      ),
                   ),
                 ),
-                child: Text(
-                    "Continue",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-
-                    ),
+              ),
+              SizedBox(height: 20),
+              Expanded(
+                flex: 14,
+                child: PageView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  controller: _pageController,
+                  itemCount: screens.length,
+                  onPageChanged: (value) {
+                    setState(() {
+                      currentPage = value;
+                    });
+                  },
+                  itemBuilder: (context, index) => screens[index]
                 ),
               ),
-            ),
-            const Spacer(),
-          ],
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  screens.length,
+                      (index) => Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: DotIndicator(isActive: index == currentPage),
+                      ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    );
-  }
-}
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.transparent,
+        child: Visibility(
+          visible: currentPage != screens.length - 1,
+          maintainSize: true,
+          maintainAnimation: true,
+          maintainState: true,
+          child: ElevatedButton(
+            onPressed: nextPage,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 50),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            child: Text(
+              (currentPage == screens.length - 1) ? "Done" : "Continue",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
 
-class OnboardContent extends StatelessWidget {
-  const OnboardContent({
-    super.key,
-    required this.illustration,
-    required this.title,
-    required this.text,
-  });
-
-  final String? illustration, title, text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: Image.network(
-              illustration!,
-              fit: BoxFit.contain,
+              ),
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        Text(
-          title!,
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge!
-              .copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          text!,
-          style: Theme.of(context).textTheme.bodyMedium,
-          textAlign: TextAlign.center,
-        ),
-      ],
+      )
     );
   }
 }
@@ -120,15 +166,15 @@ class DotIndicator extends StatelessWidget {
   const DotIndicator({
     super.key,
     this.isActive = false,
-    this.activeColor = const Color(0xFF22A45D),
-    this.inActiveColor = const Color(0xFF868686),
   });
 
   final bool isActive;
-  final Color activeColor, inActiveColor;
 
   @override
   Widget build(BuildContext context) {
+    Color activeColor = Theme.of(context).colorScheme.primary;
+    Color inActiveColor = const Color(0xFF868686);
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
       height: 6,
@@ -141,30 +187,3 @@ class DotIndicator extends StatelessWidget {
   }
 }
 
-List<Widget> screens = [
-  ActivityPreference(),
-  FoodPreference(),
-  MealTimePreference(),
-];
-
-// // Demo data for our Onboarding screen
-// List<Map<String, dynamic>> demoData = [
-//   {
-//     "illustration": "https://i.postimg.cc/L43CKddq/Illustrations.png",
-//     "title": "All your favorites",
-//     "text":
-//     "Order from the best local restaurants \nwith easy, on-demand delivery.",
-//   },
-//   {
-//     "illustration": "https://i.postimg.cc/xTjs9sY6/Illustrations-1.png",
-//     "title": "Free delivery offers",
-//     "text":
-//     "Free delivery for new customers via Apple Pay\nand others payment methods.",
-//   },
-//   {
-//     "illustration": "https://i.postimg.cc/6qcYdZVV/Illustrations-2.png",
-//     "title": "Choose your food",
-//     "text":
-//     "Easily find your type of food craving and\nyou’ll get delivery in wide range.",
-//   },
-// ];
