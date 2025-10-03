@@ -8,7 +8,7 @@ class PreferenceService {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     await prefs.setBool('isSet', true);
-    await prefs.setInt('activity', data.activityType.id);
+    await prefs.setInt('activity', data.activityType.id == 0 ? 3 : data.activityType.id);
     await prefs.setStringList('food_preferences', data.foodPreferences);
     await prefs.setDouble('breakfast_start', data.mealTime.breakfast.start);
     await prefs.setDouble('breakfast_end', data.mealTime.breakfast.end);
