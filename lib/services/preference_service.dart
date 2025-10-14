@@ -1,5 +1,4 @@
 import 'package:itc/models/preferences.dart';
-import 'package:itc/models/activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferenceService {

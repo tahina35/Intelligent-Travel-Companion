@@ -29,8 +29,8 @@ class AppRouter {
           );
         },
         redirect: (context, state) async {
-          //final bool isPreferenceSet = await PreferenceService.isPreferenceSet();
-          final bool isPreferenceSet = false;
+          final bool isPreferenceSet = await PreferenceService.isPreferenceSet();
+          //final bool isPreferenceSet = false;
           if (!isPreferenceSet) {
             return state.namedLocation(RouteConstants.onboarding);
           }

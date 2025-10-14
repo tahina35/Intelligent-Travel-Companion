@@ -44,7 +44,6 @@ class OnboardingScreenState extends State<OnboardingScreen> {
     _pageController = PageController(initialPage: currentPage);
   }
 
-
   void nextPage() {
     setState(() {
       if (currentPage < screens.length - 1) {

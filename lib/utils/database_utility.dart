@@ -1,7 +1,7 @@
 class DatabaseUtility {
 
   // Activity Table
-  static String activityTableName = 'activity';
+  static const activityTableName = 'activity';
   static const activityIdColumn = 'id';
   static const activityImageColumn = 'image';
   static const activityLabelColumn = 'label';
