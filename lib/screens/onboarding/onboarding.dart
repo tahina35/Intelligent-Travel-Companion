@@ -7,6 +7,7 @@ import 'package:itc/screens/onboarding/activity_preference.dart';
 import 'package:itc/screens/onboarding/food_preference.dart';
 import 'package:itc/screens/onboarding/meal_time_preference.dart';
 import 'package:itc/models/meal_time_preference.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../router/route_constants.dart';
 import '../../services/preference_service.dart';
@@ -44,15 +45,19 @@ class OnboardingScreenState extends State<OnboardingScreen> {
     _pageController = PageController(initialPage: currentPage);
   }
 
-  void nextPage() {
-    setState(() {
-      if (currentPage < screens.length - 1) {
+  void nextPage() async {
+    if (currentPage < screens.length - 1) {
+      setState(()  {
         currentPage++;
-      } else {
-        PreferenceService.saveData(preferences);
-        context.pushNamed(RouteConstants.loading);
+      });
+    } else {
+      if(await Permission.notification.isDenied) {
+        await Permission.notification.request();
       }
-    });
+      PreferenceService.saveData(preferences);
+      context.pushNamed(RouteConstants.loading);
+    }
+
     _pageController.animateToPage(currentPage,
         duration: const Duration(milliseconds: 400), curve: Curves.easeOutQuad);
   }
@@ -131,28 +136,22 @@ class OnboardingScreenState extends State<OnboardingScreen> {
       ),
       bottomNavigationBar: BottomAppBar(
         color: Colors.transparent,
-        child: Visibility(
-          visible: currentPage != screens.length - 1,
-          maintainSize: true,
-          maintainAnimation: true,
-          maintainState: true,
-          child: ElevatedButton(
-            onPressed: nextPage,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
+        child: ElevatedButton(
+          onPressed: nextPage,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(double.infinity, 50),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: Text(
-              (currentPage == screens.length - 1) ? "Done" : "Continue",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+          ),
+          child: Text(
+            (currentPage == screens.length - 1) ? "Allow" : "Continue",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
 
-              ),
             ),
           ),
         ),
