@@ -1,7 +1,8 @@
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/Places/place.dart';
+import '../services/firebase/firebase_remote_config_service.dart';
 import '../services/places_service.dart';
 import '../utils/helper.dart';
 
@@ -14,6 +15,15 @@ class Activities extends StatefulWidget {
 
 class _ActivitiesState extends State<Activities> {
 
+  final remoteConfigService = FirebaseRemoteConfigService(
+    firebaseRemoteConfig: FirebaseRemoteConfig.instance,
+  );
+
+  //contexts
+  String location = "";
+  String weather = "";
+  String time = "";
+
   final placesService = PlacesService();
   List<Place> _places = [];
   bool _isLoading = true;
@@ -23,6 +33,22 @@ class _ActivitiesState extends State<Activities> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    location = remoteConfigService.getLocation();
+    weather = remoteConfigService.getWeather();
+    time =  Helper.formatTime(remoteConfigService.getTime());
+
+    remoteConfigService.firebaseRemoteConfig.onConfigUpdated.listen((event) async {
+      await remoteConfigService.firebaseRemoteConfig.activate();
+      print("Remote config updated. Notifying UI to rebuild...");
+
+      setState(() {
+        location = remoteConfigService.getLocation();
+        weather = remoteConfigService.getWeather();
+        time = Helper.formatTime(remoteConfigService.getTime());
+      });
+
+    });
     _fetchPlaces();
   }
 
@@ -34,13 +60,9 @@ class _ActivitiesState extends State<Activities> {
 
     try {
 
-      Position position = await Helper.getCurrentLocation();
-
-      //TODO: implement firebase remote config
-
       List<Place> places = await placesService.searchNearby(
-        latitude: position.latitude,
-        longitude: position.longitude,
+        latitude: 45.49699,
+        longitude: -73.582895,
         radius: 500,
         types: ["restaurant", "cafe"],
         maxResultCount: 5,
@@ -67,6 +89,7 @@ class _ActivitiesState extends State<Activities> {
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 0),
@@ -80,18 +103,21 @@ class _ActivitiesState extends State<Activities> {
               ),
               child: Padding(
                   padding: EdgeInsets.all(10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  child: Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    alignment: WrapAlignment.spaceEvenly,
                     children: <Widget>[
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           Icon(
-                            Icons.location_on,
+                            Icons.access_time,
                             color: Colors.blueAccent,
                           ),
                           SizedBox(width: 5),
                           Text(
-                            'Plateau-Mont-Royal',
+                            time,
                             softWrap: true,
                             style: GoogleFonts.lato(
                               textStyle: Theme.of(context).textTheme.titleMedium,
@@ -99,26 +125,34 @@ class _ActivitiesState extends State<Activities> {
                           ),
                         ],
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.wb_sunny,
-                                color: Colors.blueAccent,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                '16°',
-                                style: GoogleFonts.lato(
-                                  textStyle: Theme.of(context).textTheme.titleMedium,
-                                ),
-                              ),
-                            ],
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Icon(
+                            Icons.location_on,
+                            color: Colors.blueAccent,
                           ),
+                          SizedBox(width: 5),
                           Text(
-                            'Moslty clear',
+                            location,
+                            softWrap: true,
+                            style: GoogleFonts.lato(
+                              textStyle: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.wb_sunny,
+                            //TODO: change icon based on weather
+                            color: Colors.blueAccent,
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            '16°  $weather',
                             style: GoogleFonts.lato(
                               textStyle: Theme.of(context).textTheme.titleMedium,
                             ),
