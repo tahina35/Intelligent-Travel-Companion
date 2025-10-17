@@ -1,4 +1,5 @@
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/Places/place.dart';
@@ -92,8 +93,8 @@ class _ActivitiesState extends State<Activities> {
 
     return Container(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 0),
-        child: ListView(
+        padding: const EdgeInsets.fromLTRB(40.0, 10.0, 40.0, 0),
+        child: Column(
           children: <Widget>[
             Container(
               decoration: BoxDecoration(
@@ -103,56 +104,55 @@ class _ActivitiesState extends State<Activities> {
               ),
               child: Padding(
                   padding: EdgeInsets.all(10.0),
-                  child: Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    alignment: WrapAlignment.spaceEvenly,
+                  child: Column(
                     children: <Widget>[
                       Row(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Icon(
-                            Icons.access_time,
-                            color: Colors.blueAccent,
+                          Row(
+                            children: <Widget>[
+                              Icon(
+                                Icons.location_on,
+                                color: Colors.blueAccent,
+                              ),
+                              SizedBox(width: 5),
+                              Text(
+                                location,
+                                softWrap: true,
+                                style: GoogleFonts.lato(
+                                  textStyle: Theme.of(context).textTheme.titleMedium,
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(width: 5),
-                          Text(
-                            time,
-                            softWrap: true,
-                            style: GoogleFonts.lato(
-                              textStyle: Theme.of(context).textTheme.titleMedium,
-                            ),
+                          Row(
+                            children: <Widget>[
+                              Icon(
+                                Icons.access_time,
+                                color: Colors.blueAccent,
+                              ),
+                              SizedBox(width: 5),
+                              Text(
+                                time,
+                                softWrap: true,
+                                style: GoogleFonts.lato(
+                                  textStyle: Theme.of(context).textTheme.titleMedium,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
+                      SizedBox(height: 10),
                       Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Icon(
-                            Icons.location_on,
-                            color: Colors.blueAccent,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            location,
-                            softWrap: true,
-                            style: GoogleFonts.lato(
-                              textStyle: Theme.of(context).textTheme.titleMedium,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.wb_sunny,
-                            //TODO: change icon based on weather
+                            Helper.stringToIconData[weather.toLowerCase()],
                             color: Colors.blueAccent,
                           ),
-                          SizedBox(width: 10),
+                          SizedBox(width: 5),
                           Text(
-                            '16°  $weather',
+                            '$weather',
                             style: GoogleFonts.lato(
                               textStyle: Theme.of(context).textTheme.titleMedium,
                             ),
@@ -163,12 +163,10 @@ class _ActivitiesState extends State<Activities> {
                   ),
               ),
             ),
-            SizedBox(height: 30),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            SizedBox(height: 25),
+            Expanded(
               child: ListView.separated(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
                 itemCount: _places.length,
                 itemBuilder: (context, index) {
                   return _buildActivityCard(_places[index]);

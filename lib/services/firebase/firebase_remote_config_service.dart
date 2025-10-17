@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'dart:developer' as developer;
@@ -20,10 +22,28 @@ class FirebaseRemoteConfigService  {
         ),
       );
 
-      await firebaseRemoteConfig.setDefaults(const {
-        "time": 9.0,
-        "location": "Concordia University",
-        "weather": "sunny",
+      final contexts = {
+        "location": "Ville-Marie",
+        "time": "9",
+        "weather": {
+          "active": "0",
+          "values": [
+            "Sunny",
+            "Rainy",
+            "Partially Cloudy",
+            "Extreme Heat",
+            "Overcast",
+            "Snow"
+          ]
+        }
+      };
+
+      await firebaseRemoteConfig.setDefaults({
+        "contexts": jsonEncode(contexts)
+      });
+
+      firebaseRemoteConfig.onConfigUpdated.listen((event) async {
+        await firebaseRemoteConfig.activate();
       });
 
       await firebaseRemoteConfig.fetchAndActivate();
@@ -37,10 +57,21 @@ class FirebaseRemoteConfigService  {
     }
   }
 
-  double getTime() => firebaseRemoteConfig.getDouble('time');
+  double getTime() {
+    Map<String, dynamic> contexts = jsonDecode(firebaseRemoteConfig.getString('contexts'));
+    return double.parse(contexts['time']);
+  }
 
-  String getLocation() => firebaseRemoteConfig.getString('location');
+  String getLocation() {
+    Map<String, dynamic> contexts = jsonDecode(firebaseRemoteConfig.getString('contexts'));
+    return contexts['location'];
+  }
 
-  String getWeather() => firebaseRemoteConfig.getString('weather');
+  String getWeather() {
+    Map<String, dynamic> contexts = jsonDecode(firebaseRemoteConfig.getString('contexts'));
+    Map<String, dynamic> weather = contexts['weather'];
+    int current_weather = int.parse(weather['active']);
+    return weather['values'][current_weather];
+  }
 
 }
