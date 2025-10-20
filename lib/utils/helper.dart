@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:itc/models/Places/regular_opening_hours.dart';
 
 class Helper {
 
@@ -21,5 +21,38 @@ class Helper {
     "overcast": CupertinoIcons.cloud_sun,
     "snow": CupertinoIcons.snow
   };
+
+  static String formatPlaceType(String type) {
+    String formattedType = type.replaceAll('_', ' ');
+    return formattedType.split(' ')
+        .map((word) => word.isNotEmpty
+        ? word[0].toUpperCase() + word.substring(1).toLowerCase()
+        : '')
+        .join(' ');
+  }
+
+  static String getCurrentOpeningStatus(double current_time, RegularOpeningHours regularOpeningHours) {
+    if(regularOpeningHours.openNow! && regularOpeningHours.periods?.length == 1) {
+      return "Open 24 hours";
+    }
+
+    int closingHour, closingMinute;
+    double closingTime = 0;
+    DateTime utcTime = DateTime.parse(regularOpeningHours.nextCloseTime!);
+    DateTime localTime = utcTime.toLocal();
+    closingHour = localTime.hour;
+    closingMinute = localTime.minute;
+    closingTime = closingHour + (closingMinute / 60);
+
+    return "Open until ${Helper.formatTime(closingTime)}";
+  }
+
+  static Map<String, int> _timeToHourMinute(double time) {
+    return {
+      "hour" : time.floor(),
+      "minute" : ((time - time.floor()) * 60).round()
+    };
+  }
+
 
 }

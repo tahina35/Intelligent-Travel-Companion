@@ -1,4 +1,5 @@
-import 'package:itc/models/Places/photos.dart';
+import 'package:itc/models/Places/photo.dart';
+import 'package:itc/models/Places/regular_opening_hours.dart';
 import 'display_name.dart';
 import 'location.dart';
 
@@ -7,14 +8,21 @@ class Place {
   List<String>? types;
   String? formattedAddress;
   Location? location;
+  double? rating;
+  int? userRatingCount;
+  RegularOpeningHours? regularOpeningHours;
   DisplayName? displayName;
-  List<Photos>? photos;
+  List<Photo>? photos;
+  late String distanceMatrix;
 
   Place(
       {this.name,
         this.types,
         this.formattedAddress,
         this.location,
+        this.rating,
+        this.userRatingCount,
+        this.regularOpeningHours,
         this.displayName,
         this.photos});
 
@@ -25,13 +33,18 @@ class Place {
     location = json['location'] != null
         ? new Location.fromJson(json['location'])
         : null;
+    rating = json['rating']?.toDouble();
+    userRatingCount = json['userRatingCount'];
+    regularOpeningHours = json['regularOpeningHours'] != null
+        ? new RegularOpeningHours.fromJson(json['regularOpeningHours'])
+        : null;
     displayName = json['displayName'] != null
         ? new DisplayName.fromJson(json['displayName'])
         : null;
     if (json['photos'] != null) {
-      photos = <Photos>[];
+      photos = <Photo>[];
       json['photos'].forEach((v) {
-        photos!.add(new Photos.fromJson(v));
+        photos!.add(new Photo.fromJson(v));
       });
     }
   }
@@ -43,6 +56,11 @@ class Place {
     data['formattedAddress'] = this.formattedAddress;
     if (this.location != null) {
       data['location'] = this.location!.toJson();
+    }
+    data['rating'] = this.rating;
+    data['userRatingCount'] = this.userRatingCount;
+    if (this.regularOpeningHours != null) {
+      data['regularOpeningHours'] = this.regularOpeningHours!.toJson();
     }
     if (this.displayName != null) {
       data['displayName'] = this.displayName!.toJson();

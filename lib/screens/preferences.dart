@@ -7,9 +7,15 @@ class Preferences extends StatefulWidget {
   State<Preferences> createState() => _PreferencesState();
 }
 
-class _PreferencesState extends State<Preferences> {
+class _PreferencesState extends State<Preferences> with AutomaticKeepAliveClientMixin {
+
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Center(
       child: Text('Preferences'),
     );

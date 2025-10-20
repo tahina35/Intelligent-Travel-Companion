@@ -1,4 +1,6 @@
-class Photos {
+import '../../utils/resources.dart';
+
+class Photo {
   String? name;
   int? widthPx;
   int? heightPx;
@@ -6,7 +8,7 @@ class Photos {
   String? flagContentUri;
   String? googleMapsUri;
 
-  Photos(
+  Photo(
       {this.name,
         this.widthPx,
         this.heightPx,
@@ -14,7 +16,7 @@ class Photos {
         this.flagContentUri,
         this.googleMapsUri});
 
-  Photos.fromJson(Map<String, dynamic> json) {
+  Photo.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     widthPx = json['widthPx'];
     heightPx = json['heightPx'];
@@ -40,6 +42,12 @@ class Photos {
     data['flagContentUri'] = this.flagContentUri;
     data['googleMapsUri'] = this.googleMapsUri;
     return data;
+  }
+
+  String getPhotoURL(int maxWidth, int maxHeight) {
+    return "https://${Resources.google_places_api_baseurl}/v1/"
+        "${name}"
+        "/media?maxHeightPx=${maxHeight}&maxWidthPx=$maxWidth&key=${Resources.api_key}";
   }
 }
 
