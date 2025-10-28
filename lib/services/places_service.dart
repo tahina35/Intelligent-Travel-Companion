@@ -24,6 +24,8 @@ class PlacesService {
     final url = Uri.https(Resources.google_places_api_baseurl, 'v1/places:searchNearby');
 
     final requestBody = {
+      //
+      // "includedTypes" : ["restaurant", "bar", "cafe"],
       "locationRestriction": {
         "circle": {
           "center": {
