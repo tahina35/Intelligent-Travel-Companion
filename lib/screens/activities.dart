@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/Places/place.dart';
+import '../models/context.dart';
 import '../services/firebase/firebase_remote_config_service.dart';
 import '../services/recommender_service.dart';
 import '../utils/helper.dart';
@@ -25,10 +26,7 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
     firebaseRemoteConfig: FirebaseRemoteConfig.instance,
   );
 
-  //contexts
-  String location = "";
-  String weather = "";
-  String time = "";
+   late Context current_context;
 
   final recommenderService = RecommenderService();
 
@@ -41,18 +39,22 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
     // TODO: implement initState
     super.initState();
 
-    location = remoteConfigService.getLocation();
-    weather = remoteConfigService.getWeather();
-    time =  Helper.formatTime(remoteConfigService.getTime());
+    current_context = Context(
+        location: remoteConfigService.getLocation(),
+        weather: remoteConfigService.getWeather(),
+        time: Helper.formatTime(remoteConfigService.getTime())
+    );
 
     remoteConfigService.firebaseRemoteConfig.onConfigUpdated.listen((event) async {
       await remoteConfigService.firebaseRemoteConfig.activate();
       print("Remote config updated. Notifying UI to rebuild...");
 
       setState(() {
-        location = remoteConfigService.getLocation();
-        weather = remoteConfigService.getWeather();
-        time = Helper.formatTime(remoteConfigService.getTime());
+        current_context = Context(
+            location: remoteConfigService.getLocation(),
+            weather: remoteConfigService.getWeather(),
+            time: Helper.formatTime(remoteConfigService.getTime())
+        );
       });
 
       _fetchPlaces();
@@ -70,7 +72,7 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
 
     try {
 
-      List<Place> places = await recommenderService.getRecommendations(location, weather, time);
+      List<Place> places = await recommenderService.getRecommendations(current_context);
 
       setState(() {
         _places = places;
@@ -118,7 +120,7 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
                               ),
                               SizedBox(width: 5),
                               Text(
-                                location,
+                                current_context.location,
                                 softWrap: true,
                                 style: GoogleFonts.lato(
                                   textStyle: Theme.of(context).textTheme.titleMedium,
@@ -134,7 +136,7 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
                               ),
                               SizedBox(width: 5),
                               Text(
-                                time,
+                                current_context.time,
                                 softWrap: true,
                                 style: GoogleFonts.lato(
                                   textStyle: Theme.of(context).textTheme.titleMedium,
@@ -148,12 +150,12 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
                       Row(
                         children: [
                           Icon(
-                            Helper.stringToIconData[weather.toLowerCase()],
+                            Helper.stringToIconData[current_context.weather.toLowerCase()],
                             color: Colors.blueAccent,
                           ),
                           SizedBox(width: 5),
                           Text(
-                            '$weather',
+                            current_context.weather,
                             style: GoogleFonts.lato(
                               textStyle: Theme.of(context).textTheme.titleMedium,
                             ),

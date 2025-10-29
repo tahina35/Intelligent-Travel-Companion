@@ -2,16 +2,18 @@ import 'package:itc/services/places_service.dart';
 import '../models/Places/place.dart';
 import 'package:geocoding/geocoding.dart';
 
+import '../models/context.dart';
+
 class RecommenderService {
 
   final placesService = PlacesService();
 
   RecommenderService();
 
-  Future<List<Place>> getRecommendations(String location, String weather, String time) async {
+  Future<List<Place>> getRecommendations(Context context) async {
      try {
 
-       Location current_location = await placesService.getLocationFromName(location + ", Montreal");
+       Location current_location = await placesService.getLocationFromName(context.location + ", Montreal");
 
        print(current_location.latitude);
        print(current_location.longitude);

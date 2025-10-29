@@ -25,7 +25,7 @@ class _MealTimePreferenceState extends State<MealTimePreference> {
     'Dinner': widget.preferences.mealTime.dinner,
   };
 
-  _rangeSlider(MealTime mealTime) {
+  _rangeSlider(MealTime mealTime, double start, double end) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -72,8 +72,8 @@ class _MealTimePreferenceState extends State<MealTimePreference> {
           jump: true,
           step: FlutterSliderStep(step: 0.5),
           rangeSlider: true,
-          max: 24,
-          min: 0,
+          max: end,
+          min: start,
           onDragging: (_handlerIndex, _lowerValue, _upperValue) {
             MealTime newMealTime = MealTime(icon: mealTime.icon, name: mealTime.name, start: _lowerValue, end: _upperValue);
             setState(() {
@@ -188,9 +188,9 @@ class _MealTimePreferenceState extends State<MealTimePreference> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _rangeSlider(mealTimes['Breakfast']!),
-                  _rangeSlider(mealTimes['Lunch']!),
-                  _rangeSlider(mealTimes['Dinner']!),
+                  _rangeSlider(mealTimes['Breakfast']!, 6, 10),
+                  _rangeSlider(mealTimes['Lunch']!, 10, 15),
+                  _rangeSlider(mealTimes['Dinner']!, 17, 22),
                 ],
               ),
             )

@@ -25,7 +25,8 @@ class PlacesService {
 
     final requestBody = {
       //
-      // "includedTypes" : ["restaurant", "bar", "cafe"],
+      "includedTypes": ["museum"],
+      "includedPrimaryTypes": Resources.included_primary_types,
       "locationRestriction": {
         "circle": {
           "center": {
