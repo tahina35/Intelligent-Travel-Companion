@@ -1,5 +1,6 @@
 import 'package:itc/models/Places/photo.dart';
 import 'package:itc/models/Places/regular_opening_hours.dart';
+import 'package:itc/models/Places/types.dart';
 import 'display_name.dart';
 import 'location.dart';
 
@@ -14,6 +15,8 @@ class Place {
   DisplayName? displayName;
   List<Photo>? photos;
   late String distanceMatrix;
+  late double score;
+  late Types primaryType;
 
   Place(
       {this.name,
@@ -47,6 +50,7 @@ class Place {
         photos!.add(new Photo.fromJson(v));
       });
     }
+    findPrimaryType();
   }
 
   Map<String, dynamic> toJson() {
@@ -69,5 +73,66 @@ class Place {
       data['photos'] = this.photos!.map((v) => v.toJson()).toList();
     }
     return data;
+  }
+
+  bool isPlaceOpen(double time) {
+
+    bool isOpen = false;
+
+    final now = DateTime.now();
+    int currentDay = now.weekday - 1;
+    int currentTime = (time * 100).toInt(); // e.g., 13.5 -> 1350
+
+    final periods = this.regularOpeningHours?.periods;
+    if (periods == null || periods.length == 1) { // place is open 24 h
+      return true;
+    }
+
+    for (final period in periods) {
+      final openInfo = period.open;
+      final closeInfo = period.close;
+
+      if (openInfo == null || closeInfo == null) continue;
+
+      int openDay = openInfo.day!;
+      int openTime = (openInfo.hour! * 100) + openInfo.minute!;
+      int closeDay = closeInfo.day!;
+      int closeTime = (closeInfo.hour! * 100) + closeInfo.minute!;
+
+      // Case 1: Opens and closes on the same day.
+      if (openDay == closeDay) {
+        if (currentDay == openDay && currentTime >= openTime && currentTime < closeTime) {
+          isOpen = true;
+          break;
+        }
+      }
+      // Case 2: Opens one day and closes the next (overnight).
+      else {
+        // Check if we are on the opening day, after the opening time.
+        if (currentDay == openDay && currentTime >= openTime) {
+          isOpen = true;
+          break;
+        }
+        // Check if we are on the closing day, before the closing time.
+        if (currentDay == closeDay && currentTime < closeTime) {
+          isOpen = true;
+          break;
+        }
+      }
+    }
+
+    return isOpen;
+  }
+
+  void findPrimaryType() {
+    for(String placeType in this.types!) {
+      try {
+        primaryType = Types.values.byName(placeType);
+        score = primaryType.baseScore;
+        break;
+      }  catch(e) {
+        continue;
+      }
+    }
   }
 }

@@ -18,15 +18,18 @@ class PlacesService {
     required double latitude,
     required double longitude,
     required double radius,
-    required geocoding.Location currentLocation
+    required geocoding.Location currentLocation,
+    required List<String> includedPrimaryTypes
   }) async {
 
     final url = Uri.https(Resources.google_places_api_baseurl, 'v1/places:searchNearby');
 
+    print(latitude);
+    print(longitude);
+
     final requestBody = {
-      //
-      "includedTypes": ["museum"],
-      "includedPrimaryTypes": Resources.included_primary_types,
+      "includedPrimaryTypes": includedPrimaryTypes,
+      "excludedTypes": Resources.exclude_types,
       "locationRestriction": {
         "circle": {
           "center": {
@@ -77,7 +80,7 @@ class PlacesService {
         {
           'origins': '${currentLocation.latitude},${currentLocation.longitude}',
           'destinations': '${placeLocation.latitude},${placeLocation.longitude}',
-          'units': 'imperial',
+          'units': 'metric',
           'mode': 'walking',
           'key': Resources.api_key
         }

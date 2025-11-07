@@ -1,3 +1,4 @@
+import 'package:itc/models/meal_time.dart';
 import 'package:itc/models/preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,26 +24,21 @@ class PreferenceService {
     return prefs.getBool('isSet') ?? false;
   }
 
-  // static Future<Preferences> readData() async {
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //
-  //   int? activity = prefs.getInt('activity');
-  //   List<String>? food_preferences = prefs.getStringList('food_preferences');
-  //   double? breakfast_start = prefs.getDouble('breakfast_start');
-  //   double? breakfast_end = prefs.getDouble('breakfast_end');
-  //   double? lunch_start = prefs.getDouble('lunch_start');
-  //   double? lunch_end = prefs.getDouble('lunch_end');
-  //   double? dinner_start = prefs.getDouble('dinner_start');
-  //   double? dinner_end = prefs.getDouble('dinner_end');
-  //
-  //   return Preferences(
-  //       active: prefs.getBool('isSet') ?? false,
-  //       foodPreferences: foodPreferences,
-  //       activityType: activity,
-  //       mealTime: mealTime
-  //   );
-  //
-  // }
+  static Future<Map<String, dynamic>> readData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return {
+      'isSet': prefs.getBool('isSet'),
+      'activity': prefs.getInt('activity'),
+      'food_preferences': prefs.getStringList('food_preferences'),
+      'breakfast_start': prefs.getDouble('breakfast_start'),
+      'breakfast_end': prefs.getDouble('breakfast_end'),
+      'lunch_start': prefs.getDouble('lunch_start'),
+      'lunch_end': prefs.getDouble('lunch_end'),
+      'dinner_start': prefs.getDouble('dinner_start'),
+      'dinner_end': prefs.getDouble('dinner_end'),
+    };
+  }
 
   Future<void> removeData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();

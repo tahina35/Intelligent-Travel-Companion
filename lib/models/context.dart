@@ -1,13 +1,32 @@
+import '../utils/helper.dart';
+
 class Context {
 
-  final location;
-  final weather;
-  final time;
+  String location;
+  String weather;
+  String time;
 
-  const Context({
+  Context({
     required this.location,
     required this.weather,
     required this.time,
-  });
+  }) {
+
+    double parsedTime = Helper.parseTime(this.time);
+
+    if((parsedTime >= 18.5 && parsedTime <= 23.5) || (parsedTime >= 0 && parsedTime <= 6)) {
+      if(weather.toLowerCase() == "sunny") {
+        this.weather = "Clear";
+      }
+    } else {
+      if(weather.toLowerCase() == "clear") {
+        this.weather = "Sunny";
+      }
+    }
+  }
+
+
+
+
 
 }

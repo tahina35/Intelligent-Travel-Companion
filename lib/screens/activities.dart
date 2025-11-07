@@ -30,7 +30,7 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
 
   final recommenderService = RecommenderService();
 
-  List<Place> _places = [];
+  List<Place?> _places = [];
   bool _isLoading = true;
   String _errorMessage = '';
 
@@ -72,7 +72,7 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
 
     try {
 
-      List<Place> places = await recommenderService.getRecommendations(current_context);
+      List<Place?> places = await recommenderService.fetchRecommendations(current_context);
 
       setState(() {
         _places = places;
@@ -172,7 +172,7 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
                 shrinkWrap: true,
                 itemCount: _places.length,
                 itemBuilder: (context, index) {
-                  return _buildActivityCard(_places[index]);
+                  return _buildActivityCard(_places[index]!);
                 },
                 separatorBuilder: (BuildContext context, int index) {
                   return SizedBox(height: 20);
@@ -245,7 +245,7 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
                     SizedBox(height: 3),
                     // Type and Distance
                     Text(
-                      Helper.formatPlaceType(place.types![0]),
+                      '${Helper.formatPlaceType(place.types![0])}',
                       style: GoogleFonts.lato(
                         textStyle: Theme.of(context).textTheme.labelLarge,
                         color: Colors.grey[600],
@@ -275,31 +275,24 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(width: 20),
-                        Visibility(
-                          visible: place.regularOpeningHours != null,
-                          child: Row(
-                            children: <Widget>[
-                              Icon(
-                                Icons.timelapse,
-                                color: Colors.blueAccent,
-                                size: 13,
+                        Row(
+                          children: <Widget>[
+                            Icon(
+                              Icons.timelapse,
+                              color: Colors.blueAccent,
+                              size: 13,
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              Helper.getCurrentOpeningStatus(remoteConfigService.getTime(), place.regularOpeningHours ?? null),
+                              style: GoogleFonts.lato(
+                                textStyle: Theme.of(context).textTheme.labelSmall,
+                                color: Colors.grey[600]
                               ),
-                              SizedBox(width: 5),
-                              Text(
-                                place.regularOpeningHours != null && place.regularOpeningHours?.openNow == true
-                                    ? Helper.getCurrentOpeningStatus(remoteConfigService.getTime(), place.regularOpeningHours!)
-                                    : "Closed",
-                                style: GoogleFonts.lato(
-                                  textStyle: Theme.of(context).textTheme.labelSmall,
-                                  color: place.regularOpeningHours != null && place.regularOpeningHours!.openNow == true
-                                      ? Colors.grey[600]
-                                      : Colors.redAccent,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ]
-                          ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ]
                         )
                       ]
                     )
@@ -321,7 +314,7 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
 
     ratingWidgetList.add(
       Text(
-        roundedRatingValue.toString(),
+        '${place.rating ?? 0}',
         style: TextStyle(
           fontSize: 14,
           color: Colors.grey[600],

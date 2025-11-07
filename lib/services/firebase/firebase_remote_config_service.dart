@@ -29,10 +29,9 @@ class FirebaseRemoteConfigService  {
           "active": "0",
           "values": [
             "Sunny",
+            "Clear",
             "Rainy",
             "Partially Cloudy",
-            "Extreme Heat",
-            "Overcast",
             "Snow"
           ]
         }
@@ -42,9 +41,9 @@ class FirebaseRemoteConfigService  {
         "contexts": jsonEncode(contexts)
       });
 
-      firebaseRemoteConfig.onConfigUpdated.listen((event) async {
-        await firebaseRemoteConfig.activate();
-      });
+      // firebaseRemoteConfig.onConfigUpdated.listen((event) async {
+      //   await firebaseRemoteConfig.activate();
+      // });
 
       await firebaseRemoteConfig.fetchAndActivate();
 
