@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/Places/place.dart';
 import '../models/context.dart';
 import '../services/firebase/firebase_remote_config_service.dart';
+import '../services/notification_service.dart';
 import '../services/recommender_service.dart';
 import '../utils/helper.dart';
 import '../utils/resources.dart';
@@ -58,6 +59,11 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
       });
 
       _fetchPlaces();
+
+      NotificationService().showNotification(
+        'New places to explore',
+        'Your recommendations have been refreshed with new options'
+      );
 
     });
 
@@ -245,20 +251,39 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
                     SizedBox(height: 3),
                     // Type and Distance
                     Text(
-                      '${Helper.formatPlaceType(place.types![0])}',
+                      '${place.displayTypes()}',
                       style: GoogleFonts.lato(
                         textStyle: Theme.of(context).textTheme.labelLarge,
                         color: Colors.grey[600],
                       ),
                     ),
                     SizedBox(height: 3),
-                    Row(
-                      children: _getRatingWidgetList(place)
-                    ),
+                    // Row(
+                    //   children: _getRatingWidgetList(place)
+                    // ),
+
                     SizedBox(height: 3),
                     // Reason
                     Row(
                       children: <Widget>[
+                        Row(
+                            children: <Widget>[
+                              Text(
+                                '${place.rating ?? 0}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              SizedBox(width: 3),
+                              Icon(
+                                  CupertinoIcons.star_fill,
+                                  size: 14,
+                                  color: Colors.amberAccent
+                              ),
+                            ]
+                        ),
+                        SizedBox(width: 15),
                         Icon(
                           Icons.directions_walk,
                           color: Colors.blueAccent,
@@ -305,94 +330,5 @@ class _ActivitiesState extends State<Activities> with AutomaticKeepAliveClientMi
       ),
     );
   }
-
-  List<Widget> _getRatingWidgetList(Place place){
-    List<Widget> ratingWidgetList = [];
-    double roundedRatingValue = place.rating == null ? 0 : ((place.rating! * 2).round() / 2 );
-    double decimalValue = roundedRatingValue - roundedRatingValue.floor();
-    int userRatingCount = place.userRatingCount ?? 0;
-
-    ratingWidgetList.add(
-      Text(
-        '${place.rating ?? 0}',
-        style: TextStyle(
-          fontSize: 14,
-          color: Colors.grey[600],
-        ),
-      )
-    );
-
-    ratingWidgetList.add(
-        SizedBox(width: 3)
-    );
-
-    ratingWidgetList.addAll(
-      List.generate(5, (index) {
-        if(index + 1 <= roundedRatingValue) {
-          return Icon(
-              Icons.star,
-              size: 16,
-              color: Colors.amberAccent
-          );
-        } else {
-          if(decimalValue == 0.5) {
-            decimalValue = 0;
-            return HalfFilledIcon(
-                icon: Icons.star,
-                size: 16,
-                color: Colors.amberAccent
-            );
-          } else {
-            return Icon(
-                Icons.star,
-                size: 16,
-                color: Colors.grey[400]
-            );
-          }
-        }
-      })
-    );
-
-    ratingWidgetList.add(
-        SizedBox(width: 3)
-    );
-
-    ratingWidgetList.add(
-        Text(
-          "($userRatingCount)",
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
-        )
-    );
-
-    return ratingWidgetList;
-  }
 }
 
-class HalfFilledIcon extends StatelessWidget {
-  final IconData icon;
-  final double size;
-  final Color color;
-
-  HalfFilledIcon({required this.icon, required this.size, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return ShaderMask(
-      blendMode: BlendMode.srcATop,
-      shaderCallback: (Rect rect) {
-        return LinearGradient(
-          stops: [0, 0.5, 0.5],
-          colors: [color, color, color.withValues(alpha: 0)],
-        ).createShader(rect);
-      },
-      child: SizedBox(
-        width: size,
-        height: size,
-        child: Icon(icon, size: size, color: Colors.grey[400]),
-      ),
-    );
-  }
-}
