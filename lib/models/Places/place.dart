@@ -1,6 +1,7 @@
 import 'package:itc/models/Places/photo.dart';
 import 'package:itc/models/Places/regular_opening_hours.dart';
 import 'package:itc/models/Places/types.dart';
+import '../../utils/helper.dart';
 import 'display_name.dart';
 import 'location.dart';
 
@@ -134,5 +135,29 @@ class Place {
         continue;
       }
     }
+  }
+
+  String displayTypes() {
+    String typesList = "";
+    final unwantedList = [
+      "point_of_interest", "establishment", "food",
+      "restaurant", "store", "food_store", "auditorium"
+    ];
+    for(int i = 0; i < 3; i++) {
+
+      if( i > 0 && unwantedList.contains(this.types![i])) {
+        break;
+      }
+
+      if(i != 0) {
+        typesList += "   •   ";
+      }
+
+      typesList += Helper.formatPlaceType(this.types![i]);
+
+
+    }
+
+    return typesList;
   }
 }

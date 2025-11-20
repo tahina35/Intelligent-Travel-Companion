@@ -140,10 +140,10 @@ enum Types {
       value: 'indoor',
       baseScore: 0.7,
       preferredHours: [
-        PreferredHours(startHour: 11, endHour: 23),
+        PreferredHours(startHour: 14, endHour: 23),
       ],
       peakHours: [
-        PeakHours(startHour: 14, endHour: 16),
+        PeakHours(startHour: 14, endHour: 17),
         PeakHours(startHour: 19, endHour: 21),
       ]
   ),

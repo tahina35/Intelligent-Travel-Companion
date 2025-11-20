@@ -13,7 +13,14 @@ class ActivityType {
   });
 
   ActivityType.origin() {
-    id = 0;
+    id = 3;
+    image = "";
+    label = "";
+    description = "";
+  }
+
+  ActivityType.fromId(int newID) {
+    id = newID;
     image = "";
     label = "";
     description = "";

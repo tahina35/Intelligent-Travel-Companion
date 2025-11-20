@@ -17,7 +17,6 @@ class _HomeState extends State<Home> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     Activities(),
-    Map(),
     Preferences()
   ];
 
@@ -67,10 +66,6 @@ class _HomeState extends State<Home> {
             BarItem(
               icon: Icons.explore_outlined,
               title: 'Explore',
-            ),
-            BarItem(
-              icon: Icons.map_outlined,
-              title: 'Map',
             ),
             BarItem(
               icon: Icons.tune,

@@ -1,6 +1,10 @@
+import 'package:flutter/material.dart';
+import 'package:itc/models/activity_type.dart';
 import 'package:itc/models/meal_time.dart';
 import 'package:itc/models/preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/meal_time_preference.dart';
 
 class PreferenceService {
 
@@ -8,7 +12,7 @@ class PreferenceService {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     await prefs.setBool('isSet', true);
-    await prefs.setInt('activity', data.activityType.id == 0 ? 3 : data.activityType.id);
+    await prefs.setInt('activity', data.activityType.id);
     await prefs.setStringList('food_preferences', data.foodPreferences);
     await prefs.setDouble('breakfast_start', data.mealTime.breakfast.start);
     await prefs.setDouble('breakfast_end', data.mealTime.breakfast.end);
@@ -24,20 +28,36 @@ class PreferenceService {
     return prefs.getBool('isSet') ?? false;
   }
 
-  static Future<Map<String, dynamic>> readData() async {
+  static Future<Preferences> readData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    return {
-      'isSet': prefs.getBool('isSet'),
-      'activity': prefs.getInt('activity'),
-      'food_preferences': prefs.getStringList('food_preferences'),
-      'breakfast_start': prefs.getDouble('breakfast_start'),
-      'breakfast_end': prefs.getDouble('breakfast_end'),
-      'lunch_start': prefs.getDouble('lunch_start'),
-      'lunch_end': prefs.getDouble('lunch_end'),
-      'dinner_start': prefs.getDouble('dinner_start'),
-      'dinner_end': prefs.getDouble('dinner_end'),
-    };
+    final preferences = Preferences(
+        active: prefs.getBool('isSet')!,
+        activityType: ActivityType.fromId(prefs.getInt('activity')!),
+        foodPreferences: prefs.getStringList('food_preferences')!,
+        mealTime: MealTimePreferences(
+            breakfast : MealTime(
+                icon: Icons.bakery_dining,
+                name: 'Breakfast',
+                start: prefs.getDouble('breakfast_start')!,
+                end: prefs.getDouble('breakfast_end')!
+            ),
+            lunch : MealTime(
+                icon: Icons.lunch_dining,
+                name: 'Lunch',
+                start: prefs.getDouble('lunch_start')!,
+                end: prefs.getDouble('lunch_end')!
+            ),
+            dinner : MealTime(
+                icon: Icons.dinner_dining,
+                name: 'Dinner',
+                start: prefs.getDouble('dinner_start')!,
+                end: prefs.getDouble('dinner_end')!
+            )
+        )
+    );
+
+    return preferences;
   }
 
   Future<void> removeData() async {

@@ -114,4 +114,24 @@ class Helper {
     };
   }
 
+  static List<String> getCuisineOptions() {
+    return [
+      '🍕 Pizza',
+      '🍣 Japanese',
+      '🌮 Mexican',
+      '🍔 Burgers',
+      '🍛 Indian',
+      '🥐 French',
+      '🧀 Poutine',
+      '☕ Café & Brunch',
+      '🥗 Healthy',
+      '🥢 Chinese',
+      '🌱 Vegetarian',
+      '🍗 American',
+      '🌿 Vegan',
+      '☀️ Gluten-Free',
+      '🥖 Bakery'
+    ];
+  }
+
 }

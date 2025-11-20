@@ -24,13 +24,7 @@ class OnboardingScreenState extends State<OnboardingScreen> {
   late PageController _pageController;
   int currentPage = 0;
 
-  Preferences preferences = Preferences(
-      active: true,
-      activityType: ActivityType.origin(),
-      mealTime: MealTimePreferences.origin(),
-      foodPreferences: []
-  );
-
+  Preferences preferences = Preferences.origin(true);
 
   late List<Widget> screens = [
     ActivityPreference(preferences: preferences),

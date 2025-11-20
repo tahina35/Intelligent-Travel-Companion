@@ -1,8 +1,8 @@
 import 'package:choice/choice.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../models/preferences.dart';
+import '../../utils/helper.dart';
 
 class FoodPreference extends StatefulWidget {
   final Preferences preferences;
@@ -14,24 +14,7 @@ class FoodPreference extends StatefulWidget {
 
 class _FoodPreferenceState extends State<FoodPreference> {
 
-  List<String> choices = [
-    '🍕 Pizza',
-    '🍣 Japanese',
-    '🌮 Mexican',
-    '🍔 Burgers',
-    '🍛 Indian',
-    '🥐 French',
-    '🧀 Poutine',
-    '☕ Café & Brunch',
-    '🥗 Healthy',
-    '🥢 Chinese',
-    '🌱 Vegetarian',
-    '🍗 American',
-    '🌿 Vegan',
-    '☀️ Gluten-Free',
-    '🥖 Bakery'
-  ];
-
+  List<String> choices = Helper.getCuisineOptions();
   List<String> selectedValue = [];
 
   initState() {
