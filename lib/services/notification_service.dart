@@ -1,8 +1,11 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
 
   final notificationsPlugin = FlutterLocalNotificationsPlugin();
+  static const String notificationEnabledKey = 'notification_status';
 
   bool _isInitialized = false;
 
@@ -25,6 +28,12 @@ class NotificationService {
     );
 
     await notificationsPlugin.initialize(initializationSettings);
+
+    final prefs = await SharedPreferences.getInstance();
+    if(!prefs.containsKey(notificationEnabledKey)) {
+      await prefs.setBool(notificationEnabledKey, false);
+    }
+
     _isInitialized = true;
   }
 
@@ -44,6 +53,14 @@ class NotificationService {
   }
 
   Future<void> showNotification(String title, String body) async {
+
+    final prefs = await SharedPreferences.getInstance();
+    final bool isEnabled = prefs.getBool(notificationEnabledKey) ?? true;
+
+    if (!isEnabled) {
+      return;
+    }
+
     if (!_isInitialized) {
       await initialize();
     }
@@ -55,5 +72,4 @@ class NotificationService {
       notificationDetails(),
     );
   }
-
 }

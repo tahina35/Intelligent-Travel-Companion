@@ -2,19 +2,62 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../router/route_constants.dart';
+import '../services/notification_service.dart';
 
-class Preferences extends StatefulWidget {
-  const Preferences({super.key});
+class Settings extends StatefulWidget {
+  const Settings({super.key});
 
   @override
-  State<Preferences> createState() => _PreferencesState();
+  State<Settings> createState() => _SettingsState();
 }
 
-class _PreferencesState extends State<Preferences> with AutomaticKeepAliveClientMixin {
+class _SettingsState extends State<Settings> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+
+  final notificationService = NotificationService();
+
+  bool isNotificationEnabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkNotificationStatus();
+  }
+
+  void _checkNotificationStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final bool isEnabled = prefs.getBool(NotificationService.notificationEnabledKey)!;
+
+    setState(() {
+      isNotificationEnabled = isEnabled;
+    });
+  }
+
+  Future<void> _handleNotificationSwitch(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    print(value);
+
+    if (value) {
+
+      setState(() {
+        isNotificationEnabled = true;
+      });
+
+      await prefs.setBool(NotificationService.notificationEnabledKey, true);
+
+    } else {
+
+      setState(() {
+        isNotificationEnabled = false;
+      });
+
+      await prefs.setBool(NotificationService.notificationEnabledKey, false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,9 +127,16 @@ class _PreferencesState extends State<Preferences> with AutomaticKeepAliveClient
                             _CustomListTile(
                               title: "Enable Notifications",
                               icon: CupertinoIcons.bell,
-                              trailing: CupertinoSwitch(
-                                value: true,
-                                onChanged: null,
+                              trailing: Switch(
+                                value: isNotificationEnabled,
+                                onChanged: (value) {
+                                  _handleNotificationSwitch(value);
+                                },
+                                activeThumbColor: Colors.white,
+                                activeTrackColor: Colors.green[400],
+                                inactiveThumbColor: Colors.white,
+                                inactiveTrackColor: Colors.grey[300],
+                                trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
                               ),
                               callback: null
                             ),
@@ -129,7 +179,6 @@ class _CustomListTile extends StatelessWidget {
       leading: Icon(icon),
       onTap: callback,
       trailing: trailing ?? const Icon(CupertinoIcons.forward, size: 18),
-      enabled: callback != null,
     );
   }
 }
