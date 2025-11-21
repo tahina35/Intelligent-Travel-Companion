@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:itc/screens/preferences.dart';
+import 'package:itc/screens/settings.dart';
 import 'package:itc/screens/map.dart';
 import 'package:itc/screens/activities.dart';
 import 'package:sliding_clipped_nav_bar/sliding_clipped_nav_bar.dart';
@@ -17,7 +17,7 @@ class _HomeState extends State<Home> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     Activities(),
-    Preferences()
+    Settings()
   ];
 
   @override
